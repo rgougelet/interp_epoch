@@ -1,0 +1,17 @@
+epoch interpolation channel
+trial-by-trial
+within-epoch channel interpolation
+interpolate epochs
+epoch interpolation
+epoch channel interpolation
+single-trial channel interpolation
+trial-by-trial channel interpolation
+channel-by-channel epoch interpolation
+
+Single-trial channel interpolation
+
+This plugin offers a custom eegplot() function that allows channels to be manually marked for interpolation within single epochs. This 
+tool helps to remove transient artifactual channel noise that might interfere with the unmixing of independent components, but avoids having
+to reject entire epochs or having to interpolate entire channels.
+
+This is similar functionality to the TBT plugin, but offers a manual and visual approach rather than purely automatic.
