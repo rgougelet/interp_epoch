@@ -8,4 +8,5 @@ if isfield(nEEG.etc, 'pipeline')
 	nEEG.etc.pipeline{end+1} = nEEG.etc.wininterp;
 end
 [ALLEEG EEG CURRENTSET] = pop_newset(ALLEEG, nEEG, CURRENTSET);
+EEG.etc.wininterp = [];
 eeglab redraw;

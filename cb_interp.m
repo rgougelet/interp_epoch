@@ -40,6 +40,11 @@ try
 		disp('...done.');
 		disp(['The following ',num2str(length(unique(int_epochs))),' epochs had at least one channel interpolated: ']);
 		disp(num2str(unique(int_epochs)))
+		if ~isempty(EEG.reject.rejmanual);
+			disp(['Manually marked whole epochs were detected. ',...
+						'Be sure to reject them under the EEGLAB ',...
+						'GUI>Tools>Reject Epochs menu option.'])
+		end
 	end
 catch me
 	clear nEEG
