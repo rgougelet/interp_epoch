@@ -13,7 +13,18 @@ try
 	int_epochs = [];
 	whole_epochs = [];
 	cnc = false;
-
+	
+	% this helps integrate with native functionality marked whole epcohs
+	if ~isempty(EEG.reject.rejmanual)
+		fi = find(EEG.reject.rejmanual);
+		strtstp = [0 EEG.pnts-1]+(fi-1)'*EEG.pnts;
+		wcol = [strtstp, repmat([1 1 .783], length(fi), 1), zeros(length(fi), EEG.nbchan)];
+		whole_trials = all(wj(:,3:5)==[1 1 .783],2);
+		wj(whole_trials,:) = []; % remove old whole trials, add updated ones
+		wj = [wj; wcol];
+		wj = unique(wj, 'rows');
+	end
+	
 	for ei = 1:ne
 		e = es(ei);
 		% Check for clicked Cancel button

@@ -1,1 +1,1 @@
-EEG = pop_interp_epoch(EEG);
+EEG = pop_mark(EEG);

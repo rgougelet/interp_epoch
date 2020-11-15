@@ -26,11 +26,14 @@ try
 				% if right clicking an already marked
 				% single channel and single epoch, then remove
 				sg_ch = all(g.winrej==r, 2);
+				sum(sg_ch)
 				if any(sg_ch)
 					g.winrej(sg_ch, :) = [];
 				else
+% 					g.winrej(1:10,1:2)
 					% if right clicking a whole marked epoch, remove whole mark
-					all_ch = all(g.winrej==[r(1), r(2)+1, [1 1 .783], false(1, g.chans)], 2);
+					all_ch = all(g.winrej==[r(1), r(2)-1, [1 1 .783], false(1, g.chans)], 2);
+					all_ch = all_ch | all(g.winrej==[r(1), r(2), [1 1 .783], false(1, g.chans)], 2);
 					if any(all_ch)
 						g.winrej(all_ch, :) = [];
 					end
@@ -46,3 +49,7 @@ catch me
 	warning("Marking channel for interpolation within single epoch failed");
 	disp( getReport(me, 'extended', 'hyperlinks', 'on' ) )
 end
+
+
+
+
