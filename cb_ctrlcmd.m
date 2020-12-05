@@ -30,7 +30,6 @@ try
 				if any(sg_ch)
 					g.winrej(sg_ch, :) = [];
 				else
-% 					g.winrej(1:10,1:2)
 					% if right clicking a whole marked epoch, remove whole mark
 					all_ch = all(g.winrej==[r(1), r(2)-1, [1 1 .783], false(1, g.chans)], 2);
 					all_ch = all_ch | all(g.winrej==[r(1), r(2), [1 1 .783], false(1, g.chans)], 2);

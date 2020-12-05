@@ -3,7 +3,7 @@ EEG.etc.wininterp = unique(EEG.etc.wininterp, 'rows');
 wn = EEG.etc.wininterp;
 % making an easier variable to work with
 ch = [];
-for i = 1:length(wn)
+for i = 1:size(wn,1)
 	chi = find(wn(i,6:end));
 	if isempty(chi); chi = 0; end
 	ch(i,:) = chi;
@@ -24,7 +24,6 @@ EEG.reject.rejmanual = rejm;
 clear nEEG;
 disp('Channels successfully marked for single-trial interpolation.');
 disp('Be sure to actually perform the interpolation using the Interpolate plugin menu option.');
-
 
 % if ~isempty(TMPREJ),  icaprefix = '';
 % 	[tmprej tmprejE] = eegplot2trial(TMPREJ,701, EEG.trials, [1           1       0.783], []);

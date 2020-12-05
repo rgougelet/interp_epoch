@@ -3,17 +3,14 @@ if ~isfield(EEG.etc,'wininterp') || isempty(EEG.etc.wininterp)
 	return;
 end
 nEEG = EEG;
-f = waitbar(0,'Interpolating single-trial channels...','Name','Interpolate',...
+f = waitbar(0,'Interpolating single-trial channels...','Name','cb_interp()',...
 		'CreateCancelBtn','setappdata(gcbf,''canceling'',1)');
 try
 	EEG.etc.wininterp = unique(EEG.etc.wininterp, 'rows'); % remove duplicate rows
-	wi = sortrows(EEG.etc.wininterp);
-	es = unique(ceil(wi(:, 2)/EEG.pnts));
-	ne = length(es);
-	int_epochs = [];
-	whole_epochs = [];
-	cnc = false;
-	
+	EEG.etc.wininterp = sortrows(EEG.etc.wininterp);
+
+	wj = EEG.etc.wininterp;
+
 	% this helps integrate with native functionality marked whole epcohs
 	if ~isempty(EEG.reject.rejmanual)
 		fi = find(EEG.reject.rejmanual);
@@ -24,6 +21,25 @@ try
 		wj = [wj; wcol];
 		wj = unique(wj, 'rows');
 	end
+
+	% overwrites the single channels if the same whole epoch is marked
+	unfirstcol = unique(wj(:,1));
+	for uniqsi = 1:length(unfirstcol)
+		startinds = unfirstcol(uniqsi)==wj(:,1);
+		if sum(startinds)<2
+			continue;
+		else
+			if any(wj(startinds,5)==.783)
+				wj(wj(startinds,5)==1)=[];
+			end
+		end
+	end
+	
+	es = unique(ceil(wj(:, 2)/EEG.pnts));
+	ne = length(es);
+	int_epochs = [];
+	whole_epochs = [];
+	cnc = false;
 	
 	for ei = 1:ne
 		e = es(ei);
@@ -40,8 +56,8 @@ try
 			waitbar(ei/ne,f)
 		end
 		evalc('ep_EEG = pop_select(EEG, ''trial'', e);');
-		ewi = wi(ceil(wi(:, 2)/EEG.pnts)==e, :);
-		[~, chs, ~] = find(ewi(:, 6:end)); % ignores whole trials marked for rejection
+		ewj = wj(ceil(wj(:, 2)/EEG.pnts)==e, :);
+		[~, chs, ~] = find(ewj(:, 6:end)); % ignores whole trials marked for rejection
 		if isempty(chs); whole_epochs(end+1) = e;
 		else int_epochs(end+1) = e; end
 		evalc('ep_EEG = eeg_interp(ep_EEG, chs, ''spherical'');');

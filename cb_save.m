@@ -4,8 +4,8 @@ if ~exist('nEEG','var')
 		return;
 end
 if isfield(nEEG.etc, 'pipeline')
-	nEEG.etc.pipeline{end+1} = 'Single-trial channels removed and interpolated: ';
-	nEEG.etc.pipeline{end+1} = nEEG.etc.wininterp;
+	nEEG.etc.pipeline{end+1,:} = 'Single-trial channels removed and interpolated: ';
+	nEEG.etc.pipeline{end+1,:} = nEEG.etc.wininterp;
 end
 [ALLEEG EEG CURRENTSET] = pop_newset(ALLEEG, nEEG, CURRENTSET);
 EEG.etc.wininterp = [];
