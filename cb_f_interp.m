@@ -1,5 +1,6 @@
 function nEEG = cb_f_interp(EEG)
-
+% todo, create new variable to store the interpolation for later
+% comparison
 if (~isfield(EEG.etc,'wininterp')) || isempty(EEG.etc.wininterp)
 	warning('No single-trial channels have been marked for interpolation')
 	return;
@@ -8,12 +9,12 @@ nEEG = EEG;
 f = waitbar(0,'Interpolating single-trial channels...','Name','cb_interp()',...
 		'CreateCancelBtn','setappdata(gcbf,''canceling'',1)');
 try
-	EEG.etc.wininterp = unique(EEG.etc.wininterp, 'rows'); % remove duplicate rows
-	EEG.etc.wininterp = sortrows(EEG.etc.wininterp);
-	wininterp = EEG.etc.wininterp;
+	nEEG.etc.wininterp = unique(nEEG.etc.wininterp, 'rows'); % remove duplicate rows
+	nEEG.etc.wininterp = sortrows(nEEG.etc.wininterp);
+	wininterp = nEEG.etc.wininterp;
 	
   % do interpolation
-	es = unique(ceil(wininterp(:, 2)/EEG.pnts));
+	es = unique(ceil(wininterp(:, 2)/nEEG.pnts));
 	ne = length(es);
 	int_epochs = [];
 	whole_epochs = [];
@@ -26,15 +27,14 @@ try
 			was_canceled = true;
 			disp('Canceled.');
 			delete(f);
-			clear nEEG
 			break
 		end
 		% Update waitbar and message
 		if ~mod(ei, floor(ne/20))
 			waitbar(ei/ne,f)
 		end
-		evalc('ep_EEG = pop_select(EEG, ''trial'', e);');
-		ewj = wininterp(ceil(wininterp(:, 2)/EEG.pnts)==e, :);
+		evalc('ep_EEG = pop_select(nEEG, ''trial'', e);');
+		ewj = wininterp(ceil(wininterp(:, 2)/nEEG.pnts)==e, :);
 		[~, chs, ~] = find(ewj(:, 6:end)); % ignores whole trials marked for rejection
 		if isempty(chs); whole_epochs(end+1) = e;
 		else int_epochs(end+1) = e; end
@@ -45,15 +45,15 @@ try
 		disp('...done.');
 		disp(['The following ',num2str(length(unique(int_epochs))),' epochs had at least one channel interpolated: ']);
 		disp(num2str(unique(int_epochs)))
-		if ~isempty(EEG.reject.rejmanual) && sum(EEG.reject.rejmanual)~=0
+		if ~isempty(nEEG.reject.rejmanual) && sum(nEEG.reject.rejmanual)~=0
 			disp(['Manually marked whole epochs were detected. ',...
 						'Be sure to reject them under the EEGLAB ',...
 						'GUI>Tools>Reject Epochs menu option.'])
 		end
 	end
 catch me
-	warning("Interpolating single-trial channels failed.");
-	disp(getReport(me, 'extended', 'hyperlinks', 'on' ));
+  disp(getReport(me, 'extended', 'hyperlinks', 'on' ));
+	error("Interpolating single-trial channels failed.");
 end
 delete(f)
 
@@ -208,4 +208,35 @@ delete(f)
 % end
 % delete(f)
 % 
+% % 		% this helps integrate with native functionality marked whole epochs
+% 		% pop_mark overwrites rejmanual after "update marks" is pressed
+% 		% the code below only does anything if rejmanual was updated separately
+% 		if ~isempty(EEG.reject.rejmanual)
+% 			rej_trial_inds = find(EEG.reject.rejmanual);
+% 			% convert rejmanual into winrej format
+% 			strtstp = [0 EEG.pnts-1]+(rej_trial_inds-1)'*EEG.pnts;
+% 			strtstp(strtstp==0) = 1;
+% 			rej_wininterp = [strtstp,...
+% 										repmat([1 1 .783],...
+% 										length(rej_trial_inds), 1),...
+% 										zeros(length(rej_trial_inds),...
+% 										EEG.nbchan)];
+% 			% list all trials referenced in wininterp
+% 			wininterp_trial_inds = round(wininterp(:,1)'/EEG.pnts)+1;
 % 
+% 			if isempty(wininterp)
+% 				wininterp = rej_wininterp;
+% 			else
+% 				% initialize marks to remove
+% 				rm_inds = false(1,length(wininterp_trial_inds)); 
+% 				% overwrites old wininterp with rejmanual except for single channel marks
+% 				for rej_trial_ind = rej_trial_inds
+% 					rm_inds = rm_inds | wininterp_trial_inds==rej_trial_ind; 
+% 				end
+% 				% removes any marks found in rejmanual but keeps single channel marks
+% 				wininterp(rm_inds,:) = [];
+% 				% add back in marks found in rejmanual
+% 				wininterp = [wininterp; rej_wininterp];
+% 				wininterp = sortrows(unique(wininterp,'rows'),1);
+% 			end
+% 		end

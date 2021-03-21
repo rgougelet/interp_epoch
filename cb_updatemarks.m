@@ -1,4 +1,4 @@
-
+% convert to function that works like EEG = cb_f_updatemarks(EEG)?
 	EEG.etc.wininterp = unique(sortrows(TMPREJ,1), 'rows');
 
 	% make an easier variable to work with
