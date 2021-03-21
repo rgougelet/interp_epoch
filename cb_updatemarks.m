@@ -1,29 +1,34 @@
-EEG.etc.wininterp = sortrows(TMPREJ,1);
-EEG.etc.wininterp = unique(EEG.etc.wininterp, 'rows');
-wn = EEG.etc.wininterp;
-% making an easier variable to work with
-ch = [];
-for i = 1:size(wn,1)
-	chi = find(wn(i,6:end));
-	if isempty(chi); chi = 0; end
-	ch(i,:) = chi;
-end
-wnt = [wn(:,1:2)/EEG.pnts, wn(:,5), ch];
-EEG.etc.wn = wnt;
-% [EEG.reject.rejmanual, EEG.reject.rejmanualE] = ...
-% 	eegplot2trial(EEG.etc.wininterp, ...
-% 	EEG.pnts+1, EEG.trials, [1 1 .783], []);
-rejm = false(1,EEG.trials);
-list_of_trials_marked = round(EEG.etc.wininterp(:,1)/EEG.pnts)+1;
-whole_trials = all(EEG.etc.wininterp(:,3:5)==[1 1 .783],2);
-rejm(unique(list_of_trials_marked(whole_trials)))= true;
-EEG.reject.rejmanual = rejm;
 
-% EEG.etc.wininterp([false; ~diff(list_of_trials_marked(whole_trials))],:) = [];
+	EEG.etc.wininterp = unique(sortrows(TMPREJ,1), 'rows');
 
-clear nEEG;
-disp('Channels successfully marked for single-trial interpolation.');
-disp('Be sure to actually perform the interpolation using the Interpolate plugin menu option.');
+	% make an easier variable to work with
+	wn = EEG.etc.wininterp;
+	ch = [];
+	for i = 1:size(wn,1)
+		chi = find(wn(i,6:end));
+		if isempty(chi); chi = 0; end
+		ch(i,:) = chi;
+	end
+	wnt = [round(wn(:,2)/EEG.pnts), wn(:,5), ch];
+	EEG.etc.wn = wnt;
+
+	% update rejmanual for removing whole trials
+	rejm = false(1,EEG.trials);
+	list_of_trials_marked = round(EEG.etc.wininterp(:,1)/EEG.pnts)+1;
+	whole_trials = all(EEG.etc.wininterp(:,3:5)==[1 1 .783],2);
+	rejm(unique(list_of_trials_marked(whole_trials)))=true;
+	EEG.reject.rejmanual = rejm;
+	EEG.etc.wininterp(whole_trials,:) = [];
+	EEG.etc.rejmanual = rejm;
+
+	clear nEEG;
+	disp('Channels successfully marked for single-trial interpolation.');
+	disp('Be sure to actually perform the interpolation using the Interpolate plugin menu option.');
+
+%% trash
+% 	[EEG.reject.rejmanual, EEG.reject.rejmanualE] = ...
+% 		eegplot2trial(EEG.etc.wininterp, ...
+% 		EEG.pnts+1, EEG.trials, [1 1 .783], []);
 
 % if ~isempty(TMPREJ),  icaprefix = '';
 % 	[tmprej tmprejE] = eegplot2trial(TMPREJ,701, EEG.trials, [1           1       0.783], []);
@@ -46,9 +51,6 @@ disp('Be sure to actually perform the interpolation using the Interpolate plugin
 % 	eeglab('redraw');
 % end;
 % clear indextmp colortmp icaprefix tmpcom tmprej tmprejE tmprejE2 TMPREJ;'
-
-
-
 
 % [EEG.etc.wininterp(:,1)/700, ...
 % EEG.etc.wininterp(:,2)-EEG.etc.wininterp(:,1),...

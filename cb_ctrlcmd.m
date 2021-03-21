@@ -9,24 +9,23 @@ try
 	tmpelec = min(max(double(tmpelec), 1), g.chans); % account for channels outside view
 	tmpelec = length(g.eloc_file)-tmpelec+1; % invert
 
-	% find nearest trials boundaries for epoched data only
-	if g.trialstag ~= -1 
+	% find nearest trial's boundaries
+	if g.trialstag ~= -1 % for epoched data only
 		lowlim = round(g.time*g.trialstag+1);
 		alltrialtag = [0:g.trialstag:g.frames];
 		I1 = find(alltrialtag < (tmppos(1)+lowlim));
 		if ~isempty(I1) && I1(end) ~= length(alltrialtag)
 			r = [max(alltrialtag(I1(end)), 1),... % left point account for if edge < 1
 				alltrialtag(I1(end)+1)-1,... % right point, alltrialtag not really needed
-				[1 1 1],... % rejections are color based, use this color
+				[1 1 1],... % rejections are color based, use this color for single channel
 				false(1, g.chans)]; % preallocate every channel to false
-			r(end, 5+tmpelec) = true; % mark channel as true
+			r(end, 5+tmpelec) = true; % mark selected channel as true
 			if isempty(g.winrej)
-				g.winrej(1, :) = r;
+				g.winrej(1, :) = r; % start new winrej if one doesn't exist
 			else
 				% if right clicking an already marked
 				% single channel and single epoch, then remove
 				sg_ch = all(g.winrej==r, 2);
-				sum(sg_ch)
 				if any(sg_ch)
 					g.winrej(sg_ch, :) = [];
 				else
@@ -48,7 +47,3 @@ catch me
 	warning("Marking channel for interpolation within single epoch failed");
 	disp( getReport(me, 'extended', 'hyperlinks', 'on' ) )
 end
-
-
-
-

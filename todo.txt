@@ -1,0 +1,1 @@
+merge save, plot, and etc into multiple buttons on eegplot window
