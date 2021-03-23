@@ -5,6 +5,13 @@ if (~isfield(EEG.etc,'wininterp')) || isempty(EEG.etc.wininterp)
 	warning('No single-trial channels have been marked for interpolation')
 	return;
 end
+if (~isfield(EEG.etc,'interp')) 
+  EEG.etc.interp = {};
+end
+if ~isempty(EEG.etc.interp)
+	warning('Old interpolated data overwritten')
+	nEEG.etc.interp = {};
+end
 nEEG = EEG;
 f = waitbar(0,'Interpolating single-trial channels...','Name','cb_interp()',...
 		'CreateCancelBtn','setappdata(gcbf,''canceling'',1)');
@@ -35,11 +42,15 @@ try
 		end
 		evalc('ep_EEG = pop_select(nEEG, ''trial'', e);');
 		ewj = wininterp(ceil(wininterp(:, 2)/nEEG.pnts)==e, :);
+    
 		[~, chs, ~] = find(ewj(:, 6:end)); % ignores whole trials marked for rejection
 		if isempty(chs); whole_epochs(end+1) = e;
 		else int_epochs(end+1) = e; end
 		evalc('ep_EEG = eeg_interp(ep_EEG, chs, ''spherical'');');
 		nEEG.data(:,:,e) = ep_EEG.data;
+    for chi = 1:length(chs)
+      nEEG.etc.interp(end+1,:) = {e, chs(chi), ep_EEG.data(chs(chi),:)};
+    end
 	end
 	if ~was_canceled
 		disp('...done.');
