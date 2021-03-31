@@ -1,18 +1,18 @@
 function nEEG = cb_f_interp(EEG)
 % todo, create new variable to store the interpolation for later
 % comparison
-if (~isfield(EEG.etc,'wininterp')) || isempty(EEG.etc.wininterp)
+nEEG = EEG;
+if (~isfield(nEEG.etc,'wininterp')) || isempty(nEEG.etc.wininterp)
 	warning('No single-trial channels have been marked for interpolation')
 	return;
 end
-if (~isfield(EEG.etc,'interp')) 
-  EEG.etc.interp = {};
+if (~isfield(nEEG.etc,'interp')) 
+  nEEG.etc.interp = {};
 end
-if ~isempty(EEG.etc.interp)
+if ~isempty(nEEG.etc.interp)
 	warning('Old interpolated data overwritten')
 	nEEG.etc.interp = {};
 end
-nEEG = EEG;
 f = waitbar(0,'Interpolating single-trial channels...','Name','cb_interp()',...
 		'CreateCancelBtn','setappdata(gcbf,''canceling'',1)');
 try
@@ -49,7 +49,7 @@ try
 		evalc('ep_EEG = eeg_interp(ep_EEG, chs, ''spherical'');');
 		nEEG.data(:,:,e) = ep_EEG.data;
     for chi = 1:length(chs)
-      nEEG.etc.interp(end+1,:) = {e, chs(chi), ep_EEG.data(chs(chi),:)};
+      nEEG.etc.interp(end+1,:) = {e, chs(chi), EEG.data(:,:,e), ep_EEG.data(chs(chi),:)};
     end
 	end
 	if ~was_canceled
