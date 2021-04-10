@@ -12,12 +12,6 @@ try
 % 	EEG = nEEG;
 	EEG.saved = 'no';
  	[ALLEEG EEG CURRENTSET] = pop_newset(ALLEEG, EEG, CURRENTSET);
-% 	if isfield(EEG.etc, 'pipeline')
-% 		EEG.etc.pipeline{end+1, :} = 'Single-trial channels removed and interpolated: ';
-% 		EEG.etc.pipeline{end+1, :} = EEG.etc.wininterp;
-% 		EEG.etc.pipeline{end+1, :} = EEG.etc.wn;
-% 		EEG.etc.pipeline{end+1, :} = ['Saved as ', EEG.setname, ' to ', EEG.filepath, ' at ', datestr(now)];
-% 	end
 	EEG.etc.wininterp = [];
 	EEG.etc.wn = [];
 % 	evalc('EEG = pop_saveset(EEG, ''filename'', EEG.setname, ''filepath'', EEG.filepath);')
