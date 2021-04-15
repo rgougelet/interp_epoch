@@ -55,7 +55,11 @@ try
     % get single epoch to interpolate channels within
 		evalc('ep_EEG = pop_select(oldEEG, ''trial'', e);');
 		evalc('ep_EEG = eeg_interp(ep_EEG, chs, ''spherical'');');
+    if sum(sum(nEEG.data(:,:,e) - ep_EEG.data))==0
+      error;
+    end
 		nEEG.data(:,:,e) = ep_EEG.data; % overwrite old data with new interpolated
+    
     for chi = 1:length(chs) % potential for multiple channels per epoch
       nEEG.etc.interp(end+1,:) = {e, chs(chi), nEEG.data(chs(chi),:,e), oldEEG.data(chs(chi),:,e)};
     end
@@ -66,7 +70,7 @@ try
     disp(sprintf([repmat('   %i',1,10) '\n'],unique(int_epochs))); %#ok<DSPS>
 		if ~isempty(nEEG.reject.rejmanual) && sum(nEEG.reject.rejmanual)~=0
 			fprintf(['\nSome whole epochs were manually marked for rejection. \n',...
-						'Be sure to reject them under the\n',...
+						'Be sure to reject them in EEGLAB using the\n',...
 						'EEGLAB GUI>Tools>Reject Epochs menu option.\n'])
 		end
   end
