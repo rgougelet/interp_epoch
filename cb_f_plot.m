@@ -1,12 +1,9 @@
 function cb_f_plot(nEEG)
-
-if ~isfield(nEEG.etc,'wininterp') || isempty(nEEG.etc.wininterp)
-		warning(['No single-trial channels have been marked for interpolation.',...
-					'Make sure to use the Mark menu option and then the Interpolate option after marking.'])
-		return;
-end
+% todo: add functionality for "update mark/reject" button to scroll to next
+% interped epoch
 if ~isfield(nEEG.etc,'interp') || isempty(nEEG.etc.interp)
-		warning('No single-trial channels have been interpolated. Make sure to use the Interpolate menu option after Marking.')
+		warning(['No single-trial channels have been interpolated. ',... 
+      'Make sure to use the Interpolate menu option after Marking.'])
 		return;
 end
 
@@ -17,6 +14,8 @@ for  interp_i = 1:length(nEEG.etc.interp)
 end
 
 if ~isempty(nEEG.reject.rejmanual)
+  nEEG = update_wininterp_with_rejmanual(nEEG);
+  nEEG = update_wn_with_wininterp(nEEG);
 	wj = nEEG.etc.wininterp;
 	wj(wj(:,5)~=.783,:) = [];
 

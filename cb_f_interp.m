@@ -4,7 +4,7 @@ if (~isfield(nEEG.etc,'wininterp')) || isempty(nEEG.etc.wininterp)
 	warning('No single-trial channels have been marked for interpolation')
 	return;
 end
-if (~isfield(nEEG.etc,'interp')) 
+if (~isfield(nEEG.etc,'interp')) || isempty(nEEG.etc.interp)
   nEEG.etc.interp = {};
 end
 if ~isempty(nEEG.etc.interp)
