@@ -8,7 +8,7 @@ if ~isfield(nEEG.etc,'interp') || isempty(nEEG.etc.interp)
 end
 
 oldEEG = nEEG;
-for  interp_i = 1:length(nEEG.etc.interp)
+for  interp_i = 1:size(nEEG.etc.interp,1)
   interp = nEEG.etc.interp(interp_i,:);
   oldEEG.data(interp{2},:,interp{1}) = interp{4};
 end

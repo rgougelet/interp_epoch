@@ -1,6 +1,11 @@
 function nEEG = cb_f_interp(oldEEG)
+
+% todo 5/26/21 add in ability to pass options to interp function
+
 nEEG = oldEEG;
 if (~isfield(nEEG.etc,'wininterp')) || isempty(nEEG.etc.wininterp)
+  nEEG.etc.wininterp = [];
+  nEEG.etc.interp = {};
 	warning('No single-trial channels have been marked for interpolation')
 	return;
 end
@@ -27,6 +32,9 @@ try
 	whole_epochs = [];
 	was_canceled = false;
 	
+  % each marked epoch is singled out then interpolated
+  % todo: concatenate all marked epochs so interpolation is only done once,
+  % then sort out the results
 	for ei = 1:ne
 		e = es(ei);
 		% Check for clicked Cancel button
@@ -45,21 +53,19 @@ try
     % identify marked whole trial vs. single channel within trial
     ewj = wininterp(ceil(wininterp(:, 2)/nEEG.pnts)==e, :);
     [~, chs, ~] = find(ewj(:, 6:end));
-
 		if isempty(chs)
       whole_epochs(end+1) = e;
       continue;
     else
       int_epochs(end+1) = e;
     end
+    
     % get single epoch to interpolate channels within
 		evalc('ep_EEG = pop_select(oldEEG, ''trial'', e);');
 		evalc('ep_EEG = eeg_interp(ep_EEG, chs, ''spherical'');');
-    if sum(sum(nEEG.data(:,:,e) - ep_EEG.data))==0
-      error;
-    end
 		nEEG.data(:,:,e) = ep_EEG.data; % overwrite old data with new interpolated
     
+    % save old/new data
     for chi = 1:length(chs) % potential for multiple channels per epoch
       nEEG.etc.interp(end+1,:) = {e, chs(chi), nEEG.data(chs(chi),:,e), oldEEG.data(chs(chi),:,e)};
     end
@@ -71,7 +77,7 @@ try
 		if ~isempty(nEEG.reject.rejmanual) && sum(nEEG.reject.rejmanual)~=0
 			fprintf(['\nSome whole epochs were manually marked for rejection. \n',...
 						'Be sure to reject them in EEGLAB using the\n',...
-						'EEGLAB GUI>Tools>Reject Epochs menu option.\n'])
+						'EEGLAB GUI>Tools>Reject Epochs menu option.\n\n'])
 		end
   end
   delete(f)

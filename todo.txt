@@ -1,1 +1,3 @@
 merge save, plot, and etc into multiple buttons on eegplot window
+create dropdown menu in eegplot that one can select which function the
+right (maybe left) click button does

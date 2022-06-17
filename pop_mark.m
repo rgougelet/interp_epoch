@@ -1,10 +1,12 @@
 function EEG = pop_mark(EEG)
-
+  if ~isfield(EEG.etc, 'wininterp')
+    EEG.etc.wininterp = [];
+  end
 	if ~isempty(EEG.reject.rejmanual)
 		EEG = update_wininterp_with_rejmanual(EEG);
 	end
 
-	eegplot(EEG.data,...
+	ie_eegplot(EEG.data,...
 		'command', 'cb_updatemarks',...
 		'events', EEG.event,...
 		'srate', EEG.srate,...
@@ -19,4 +21,5 @@ function EEG = pop_mark(EEG)
 
 % [1 1 1] red single channel trial
 % [1 1 .783] whole epoch
-% eegplot reject via inspection function goes from 1 to 701 but switches to 0 to 700
+% eegplot reject via inspection function goes from 1 to EEG.pnts but
+% switches to 0 to EEG.pnts-1

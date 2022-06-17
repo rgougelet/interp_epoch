@@ -12,7 +12,7 @@ try
 	% find nearest trial's boundaries
 	if g.trialstag ~= -1 % for epoched data only
 		lowlim = round(g.time*g.trialstag+1);
-		alltrialtag = [0:g.trialstag:g.frames];
+		alltrialtag = 0:g.trialstag:g.frames;
 		I1 = find(alltrialtag < (tmppos(1)+lowlim));
 		if ~isempty(I1) && I1(end) ~= length(alltrialtag)
 			r = [max(alltrialtag(I1(end)), 1),... % left point account for if edge < 1

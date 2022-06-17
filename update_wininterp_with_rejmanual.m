@@ -1,7 +1,10 @@
 function EEG = update_wininterp_with_rejmanual(EEG)
-  % overwrites old rejmanual marks in wininterp with new marks (does nothing
-  % if they are the same)
-	if ~isfield(EEG.etc,'wininterp') || isempty(EEG.etc.wininterp)
+  % overwrites old rejmanual marks in wininterp with new marks 
+  % e.g. if rejmanual was changed outside the plugin using EEGLAB gui, it
+  % adds those changes to wininterp, thus overwriting single channel marks
+  % or undoing whole epoch marks. update_rejmanual_with_wininterp should
+  % be immediately called after this, usually when update marks is pressed
+  if ~isfield(EEG.etc,'wininterp') || isempty(EEG.etc.wininterp)
 		wininterp = []; 
 	else
 		wininterp = EEG.etc.wininterp;
@@ -18,14 +21,16 @@ function EEG = update_wininterp_with_rejmanual(EEG)
   if isempty(wininterp)
     wininterp = rej_wininterp;
   else
-   
+    % remove all old wininterp marks (sometimes more than one per trial)
     wininterp_trial_inds = round(wininterp(:,1)'/EEG.pnts)+1;
     rm_inds = false(1,length(wininterp_trial_inds));
     for rej_trial_ind = rej_trial_inds
       rm_inds = rm_inds | wininterp_trial_inds==rej_trial_ind;
     end
-    wininterp(rm_inds,:) = []; % remove old
-    wininterp = [wininterp; rej_wininterp]; % add new
+    wininterp(rm_inds,:) = [];
+    
+    % add new from rejmanual only, in wininterp/winrej format
+    wininterp = [wininterp; rej_wininterp]; 
     wininterp = sortrows(unique(wininterp,'rows'),1);
   end
   
